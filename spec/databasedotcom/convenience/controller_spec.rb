@@ -1,18 +1,18 @@
 require 'spec_helper'
 
-describe Databasedotcom::Rails::Controller do
+describe Databasedotcom::Convenience do
   class TestController
-    include Databasedotcom::Rails::Controller
-    
-    def reference_Foo
+    include Databasedotcom::Convenience
+
+    def reference_foo
       Foo.create
     end
-    
-    def reference_Bar
+
+    def reference_bar
       Bar.create
     end
   end
-  
+
   describe ".dbdc_client" do
     after(:each) do
       TestController.dbdc_client = nil
@@ -63,59 +63,59 @@ describe Databasedotcom::Rails::Controller do
       end
     end
   end
-  
+
   describe ".sobject_types" do
     before(:each) do
       @client_double = double("client")
       TestController.should_receive(:dbdc_client).any_number_of_times.and_return(@client_double)
     end
-    
+
     after(:each) do
       TestController.instance_variable_set("@sobject_types", nil)
     end
-    
+
     it "requests the sobject types from the client" do
       @client_double.should_receive(:list_sobjects)
       TestController.sobject_types
     end
-    
+
     it "is memoized" do
       @client_double.should_receive(:list_sobjects).exactly(1).times.and_return(%w(foo bar))
       TestController.sobject_types
-      TestController.sobject_types      
+      TestController.sobject_types
     end
   end
-  
+
   describe "#dbdc_client" do
     it "calls .dbdc_client" do
       TestController.should_receive(:dbdc_client)
       TestController.new.send(:dbdc_client)
     end
   end
-  
+
   describe "#sobject_types" do
     it "calls .sobject_types" do
       TestController.should_receive(:sobject_types)
       TestController.new.send(:sobject_types)
     end
   end
-  
+
   describe "automatic materialization" do
     before(:each) do
       @client_double = double("client")
       TestController.should_receive(:sobject_types).and_return(%w(Foo))
     end
-    
+
     it "attempts to materialize a referenced constant that is a known sobject type" do
       TestController.should_receive(:dbdc_client).and_return(@client_double)
       @client_double.should_receive(:materialize).with("Foo").and_return(double("foo", :create => true))
-      TestController.new.reference_Foo
+      TestController.new.reference_foo
     end
-    
+
     it "does not attempt to materialize a referenced constant that is not a known sobject type" do
       TestController.should_not_receive(:dbdc_client)
       expect {
-        TestController.new.reference_Bar
+        TestController.new.reference_bar
       }.to raise_error(NameError)
     end
   end
