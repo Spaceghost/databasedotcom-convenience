@@ -1,10 +1,19 @@
 module Databasedotcom
   module Convenience
+
+    def self.env
+      return ENV['RAILS_ENV'].to_sym unless ENV['RAILS_ENV'].nil?
+      return ENV['RACK_ENV'].to_sym  unless ENV['RACK_ENV'].nil?
+      return ENV['APP_ENV'].to_sym   unless ENV['APP_ENV'].nil?
+      return :development
+    end
+
     module ClassMethods
+
       def dbdc_client
         unless @dbdc_client
-          config = YAML.load_file(File.join(::Rails.root, 'config', 'databasedotcom.yml'))
-          config = config.has_key?(::Rails.env) ? config[::Rails.env] : config
+          config = YAML.load_file(File.join(File.join Dir.pwd, 'config', 'databasedotcom.yml'))
+          config = config.has_key?(::Databasedotcom::Convenience.env) ? config[::Databasedotcom::Convenience.env] : config
           username = config["username"]
           password = config["password"]
           @dbdc_client = Databasedotcom::Client.new(config)
