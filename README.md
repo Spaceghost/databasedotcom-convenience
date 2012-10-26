@@ -1,9 +1,10 @@
 # databasedotcom-convenience
 
-Convenience modules to make using the databasedotcom gem even easier
+A convenience module to make talking to databasedotcom convenient.
 
 #Installation
     gem install databasedotcom-convenience
+
 or, if you use Bundler
 
     gem 'databasedotcom-convenience'
@@ -12,7 +13,8 @@ or, if you use Bundler
 
 * Include `Databasedotcom::Convenience` into your class
 
-* Create a YAML file at #{Rails.root}/config/databasedotcom.yml' file, like so
+* Create a YAML file at 'config/databasedotcom.yml' derived from your project root.
+* Example below:
 
         ---
         client_id: put-your-client-id-here
@@ -30,9 +32,8 @@ or, if you use Bundler
             client_id: ...
 
 
-* Call `YourClass.coerce_params` before you pass parameters submitted from an HTML form to your materialized Sobject
 
-# Example
+# Rails example
 
     class UsersController < ApplicationController
       include Databasedotcom::Convenience
@@ -77,7 +78,19 @@ or, if you use Bundler
       end
     end
 
-Note that there is no need to declare the `User` class anywhere- `Databasedotcom::Convenience` recognizes it as a known Sobject type from your database.com instance, and materializes it automatically.
+# Example
+    module Service::Databasedotcom
+      include Databasedotcom::Convenience
+
+      def self.build_user id
+        @user = User.find id
+        @user['fullname'] = [@user.first_name, @user.last_name].join "  "
+      end
+    end
+
+This is a contrived example. Check out the `databasedotcom` gem for more information on querying.
+
+Note that there is no need to declare the User class anywhere- `Databasedotcom::Convenience` recognizes it as a known Sobject type from your database.com instance, and materializes it automatically.
 
 # License
 
