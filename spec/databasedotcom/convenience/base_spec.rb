@@ -19,10 +19,22 @@ def reset_env framework=:all
   end
 end
 
-describe Databasedotcom::Convenience do
+class Klass
+  include Databasedotcom::Convenience
+
+  def reference_foo
+    Foo.create
+  end
+
+  def reference_bar
+    Bar.create
+  end
+end
+
+describe Databasedotcom::Convenience, 'methods' do
 
   describe '.env' do
-    before :each do
+    before do
       reset_env
     end
 
@@ -52,25 +64,13 @@ describe Databasedotcom::Convenience do
     end
   end
 
-  class Klass
-    include Databasedotcom::Convenience
-
-    def reference_foo
-      Foo.create
-    end
-
-    def reference_bar
-      Bar.create
-    end
-  end
-
   describe ".dbdc_client" do
-    after(:each) do
+    after do
       Klass.dbdc_client = nil
     end
 
     describe "if the config has an entry that matches environment variables" do
-      before (:each) do
+      before do
         config_hash = { :production => { "client_id" => "production_client_id", "client_secret" => "production_client_secret",  "username" => "production_foo", "password" => "production_bar" },
           :development => { "client_id" => "development_client_id", "client_secret" => "development_client_secret",  "username" => "development_foo", "password" => "development_bar" },
           :test => { "client_id" => "test_client_id", "client_secret" => "test_client_secret",  "username" => "test_foo", "password" => "test_bar" }
@@ -81,13 +81,14 @@ describe Databasedotcom::Convenience do
         ::Databasedotcom::Convenience.stub!(:env).and_return(:production)
       end
 
-      it "should use the corresponding entry" do
+      specify "it uses the corresponding entry" do
         Databasedotcom::Client.any_instance.should_receive(:authenticate).with(:username => "production_foo", :password => "production_bar")
         Klass.dbdc_client
       end
     end
+
     describe "if the config does not have an entry that matches Rails.env" do
-      it "should use the top level config" do
+      it "it uses the top level config" do
         conf_hash = { "client_id" => "client_id", "client_secret" => "client_secret",  "username" => "foo", "password" => "bar" }
         ::Databasedotcom::Convenience.stub!(:env).and_return(:production)
         YAML.should_receive(:load_file).and_return(conf_hash)
