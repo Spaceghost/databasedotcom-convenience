@@ -6,8 +6,8 @@ Gem::Specification.new do |s|
   s.name        = "databasedotcom-convenience"
   s.version     = Databasedotcom::Convenience::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Johnneylee Jack Rollins"]
-  s.email       = ["Johnneylee Jack Rollins"]
+  s.authors     = ["Danny Burkes, Johnneylee Jack Rollins"]
+  s.email       = ["Johnneylee.Rollins@gmail.com"]
   s.homepage    = "http://github.com/Spaceghost/databasedotcom-convenience"
   s.summary     = %q{Convenience classes to make using the databasedotcom gem even easier}
   s.description = %q{Convenience classes to make using the databasedotcom gem even easier}
